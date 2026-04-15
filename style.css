@@ -1,0 +1,147 @@
+:root {
+    --primary: #2563eb;
+    --success: #059669;
+    --bg: #f8fafc;
+    --text: #1e293b;
+    --axis-height: 700px;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+}
+
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.hidden { display: none !important; }
+
+.shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    max-width: 500px;
+    text-align: center;
+}
+
+/* Layout experimentu */
+.main-layout {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    max-width: 1100px;
+    align-items: flex-start;
+}
+
+.sidebar {
+    flex: 1;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.words-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    min-height: 200px;
+}
+
+/* Vertikální Osa - HLAVNÍ ZMĚNA */
+.axis-area {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.axis-container {
+    display: flex;
+    height: var(--axis-height);
+    position: relative;
+    padding-right: 60px;
+}
+
+/* Stupnice (čísla) */
+.axis-ticks {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-right: 15px;
+    font-weight: bold;
+    color: #64748b;
+    text-align: right;
+}
+
+.axis {
+    width: 120px;
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    position: relative;
+}
+
+.axis-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #cbd5e1;
+    transform: translateX(-50%);
+}
+
+/* Design slova (karty) */
+.word {
+    padding: 8px 16px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 6px;
+    cursor: grab;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s;
+    z-index: 100;
+}
+
+.word.in-axis {
+    position: absolute;
+    width: 80px;
+    text-align: center;
+}
+
+.word:active { cursor: grabbing; transform: scale(1.05); }
+
+/* Tlačítka */
+input[type="text"] {
+    width: 80%;
+    padding: 12px;
+    margin: 20px 0;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+button {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-save { background: #1e293b; margin-top: 20px; }
