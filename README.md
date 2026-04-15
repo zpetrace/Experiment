@@ -30,10 +30,10 @@ Výsledný soubor je pojmenován jako `vysledky_[ID].csv` a obsahuje:
 - **Řazení:** Data v CSV jsou automaticky seřazena sestupně (od nejmocnějšího po nejméně mocné).
 - **Oddělovač:** Jako oddělovač je použit středník (`;`).
 
+### 📝 Licence
+Tento nástroj byl vytvořen pro vědecké a studijní účely.
+
 ## ⚙️ Úpravy experimentu
 Seznam slov můžete snadno změnit v souboru `script.js` na prvním řádku:
 ```javascript
 const wordsList = ["Prezident", "Král", "Sluha", ...];
-
-📝 Licence
-Tento nástroj byl vytvořen pro vědecké a studijní účely.
