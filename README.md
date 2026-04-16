@@ -1,6 +1,6 @@
-# Experiment: Sémantické hodnocení moci (Power)
+# Experiment: Sémantické hodnocení slov
 
-Tato webová aplikace slouží k psycholingvistickému experimentu, ve kterém účastníci seřazují seznam slov na vertikální ose podle toho, jakou míru "moci" (power) danému pojmu přisuzují.
+Tato webová aplikace slouží k psycholingvistickému experimentu v religionistice, ve kterém účastníci seřazují seznam slov na vertikální ose podle toho, jak dobré nebo špatné se jim slovo zdá.
 
 ## 🚀 Funkcionalita
 - **Úvodní obrazovka:** Sběr registračního čísla účastníka.
@@ -23,7 +23,7 @@ Tato webová aplikace slouží k psycholingvistickému experimentu, ve kterém �
 Výsledný soubor je pojmenován jako `vysledky_[ID].csv` a obsahuje:
 - **ID_Ucastnika:** Registrační číslo zadané na začátku.
 - **Slovo:** Konkrétní hodnocený pojem.
-- **Body_Moc:** Číselná hodnota 0–100 (0 = nejméně moci, 100 = nejvíce moci).
+- **Body:** Číselná hodnota 0–100.
 
 ### Technické poznámky k exportu:
 - **Kódování:** Soubor je exportován v UTF-8 s příznakem BOM. To zajišťuje, že se **česká diakritika zobrazí správně** při přímém otevření v aplikaci Microsoft Excel.
