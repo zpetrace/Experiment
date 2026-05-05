@@ -114,6 +114,7 @@ function showNextWordOneByOne() {
 }
 
 function renderWordsForVariant(variantKey) {
+    removeSubmitErrorBanner();
     wordsBank.innerHTML = "";
     axis.querySelectorAll(".word").forEach((word) => word.remove());
     finishBtn.classList.add("hidden");
@@ -204,7 +205,22 @@ function checkAllPlaced() {
     }
 }
 
-// --- 4. EXPORT DAT (+ odeslání na Vercel /api/submit → e-mail přes Resend) ---
+function removeSubmitErrorBanner() {
+    document.getElementById("submit-error-banner")?.remove();
+}
+
+function showSubmitErrorBanner(message) {
+    removeSubmitErrorBanner();
+    const banner = document.createElement("div");
+    banner.id = "submit-error-banner";
+    banner.className = "submit-error-banner";
+    banner.setAttribute("role", "alert");
+    banner.textContent = message;
+    const instructionsBlock = document.querySelector("#experiment-screen .instructions");
+    instructionsBlock?.insertAdjacentElement("afterend", banner);
+}
+
+// --- 4. Odeslání výsledků (Vercel /api/submit → e-mail přes Resend, bez stahování souboru) ---
 finishBtn.addEventListener("click", async () => {
     const results = [];
     axis.querySelectorAll(".word").forEach((w) => {
@@ -224,7 +240,6 @@ finishBtn.addEventListener("click", async () => {
         variantSelect.selectedOptions[0].textContent.trim() ||
         String(Array.from(variantSelect.options).findIndex((o) => o.value === selectedVariantKey) + 1);
 
-    // CSV: číslo, které účastník viděl (1–6), plus plný popis pro výzkumníka
     let csv =
         "ID_Ucastnika;Varianta_Cislo_Ucastnika;Varianta_Klic;Varianta_Popis;Kategorie_V_Session;Slovo_Kategorie;Slovo;Body_Moc\n";
     results.forEach((r) => {
@@ -233,6 +248,7 @@ finishBtn.addEventListener("click", async () => {
 
     const csvWithBom = `\uFEFF${csv}`;
 
+    removeSubmitErrorBanner();
     finishBtn.disabled = true;
 
     let emailStatus = "skipped";
@@ -259,44 +275,29 @@ finishBtn.addEventListener("click", async () => {
         emailStatus = "failed";
     }
 
-    // Stažení s BOM kvůli češtině v Excelu (záloha u účastníka)
-    const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `vysledky_${participantId}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    experimentScreen.replaceChildren();
-
-    const heading = document.createElement("h1");
-    heading.textContent = "Hotovo!";
-    experimentScreen.appendChild(heading);
-
-    const thanks = document.createElement("p");
-    thanks.appendChild(document.createTextNode("Děkujeme. Kopie dat ("));
-    const codeEl = document.createElement("code");
-    codeEl.textContent = `vysledky_${participantId}.csv`;
-    thanks.appendChild(codeEl);
-    thanks.appendChild(document.createTextNode(") byla stažena do vašeho počítače."));
-    experimentScreen.appendChild(thanks);
-
     if (emailStatus === "sent") {
-        const emailOkEl = document.createElement("p");
-        emailOkEl.textContent =
-            "Výsledky byly zároveň odeslány výzkumníkovi na zadaný e-mail serveru.";
-        experimentScreen.appendChild(emailOkEl);
-    } else if (emailStatus === "failed") {
-        const emailFailEl = document.createElement("p");
-        const strong = document.createElement("strong");
-        strong.textContent = "Automatické odeslání e-mailem se nepodařilo.";
-        emailFailEl.appendChild(strong);
-        emailFailEl.appendChild(
-            document.createTextNode(
-                " Soubor byl stažen do vašeho počítače — uchovejte ho prosím nebo ho výzkumníkovi předejte."
-            )
+        experimentScreen.replaceChildren();
+
+        const heading = document.createElement("h1");
+        heading.textContent = "Hotovo!";
+        experimentScreen.appendChild(heading);
+
+        const thanks = document.createElement("p");
+        thanks.textContent =
+            "Děkujeme. Vaše odpovědi byly odeslány výzkumníkovi e-mailem. Můžete zavřít okno prohlížeče.";
+        experimentScreen.appendChild(thanks);
+        return;
+    }
+
+    finishBtn.disabled = false;
+
+    if (emailStatus === "skipped") {
+        showSubmitErrorBanner(
+            "Odeslání na server není nastavené. Informujte prosím výzkumníka (chybí konfigurace e-mailu na serveru)."
         );
-        experimentScreen.appendChild(emailFailEl);
+    } else {
+        showSubmitErrorBanner(
+            "Odeslání se nepodařilo. Zkuste prosím znovu kliknout na „Odeslat výsledky“. Pokud to nepomůže, informujte výzkumníka."
+        );
     }
 });

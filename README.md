@@ -38,10 +38,10 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 - Levý panel (zásobník a instrukce) má vlastní posuvník, pokud je obsahu hodně; na úzkých displejích je pod osou (**media query** cca **720px**).
 - Šířka osy se mění podle zařízení (**CSS `clamp`** na šířku osu).
 
-### Dokončení a export
-- Tlačítko **„Uložit a stáhnout data“** se zobrazí až po umístění všech slov aktuální varianty na osu.
-- Vygeneruje se soubor **`vysledky_[ID].csv`** (UTF-8 s **BOM** kvůli Excelu), oddělovač polí **`;`**, řádky seřazené **sestupně podle skóre**.
-- Při nasazení na **Vercel** se stejná data po dokončení navíc pokusí odeslat na serverovou funkci **`/api/submit`**, která je doručí na váš e-mail přes službu **Resend** (viz níže). Lokální otevření bez této služby pouze stáhne CSV.
+### Dokončení a odeslání
+- Tlačítko **„Odeslat výsledky“** se zobrazí až po umístění všech slov aktuální varianty na osu.
+- Po kliknutí se data odešlou na serverovou funkci **`/api/submit`** (Vercel), která je doručí výzkumníkovi **e-mailem** přes **Resend** jako přílohu **`vysledky_[ID].csv`** (UTF-8 s **BOM**, oddělovač **`;`**, řádky seřazené sestupně podle skóre). **Na počítači účastníka se nic nestahuje.**
+- Pokud odeslání selže nebo není server nakonfigurovaný, zobrazí se upozornění a účastník může zkusit odeslat znovu.
 
 ## Struktura souborů
 
@@ -49,7 +49,7 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 |-----------------|------|
 | `index.html` | Stránky, úvodní formulář (ID + volba 1–6), rozložení experimentu |
 | `style.css` | Vzhled, responzivní layout, osa a karty slov |
-| `script.js` | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, CSV export a volání API |
+| `script.js` | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, sestavení CSV a odeslání přes API |
 | `api/submit.js` | **Serverless funkce (Vercel):** přijme CSV v JSON a odešle ho e-mailem (Resend) |
 | `package.json` | Závislost `resend` pro e-mailovou funkci |
 
@@ -86,7 +86,7 @@ Do e-mailu i CSV jdou identifikátor účastníka a jeho odpovědi. Používejte
 
 ### Bez nastavení env proměnných
 
-Pokud **`RESEND_API_KEY`** nebo **`RESULTS_EMAIL`** chybí, API vrátí stav **503** a účastník **u sebe stejně stáhne CSV**; na konci se nezobrazí potvrzení o e-mailu (nebo se zobrazí varování při chybě odeslání).
+Pokud **`RESEND_API_KEY`** nebo **`RESULTS_EMAIL`** chybí, API vrátí stav **503** a účastník uvidí upozornění (žádný soubor se nestahuje). Při chybě sítě nebo Resend se zobrazí hláška a lze zkusit **Odeslat výsledky** znovu.
 
 ## Export dat (CSV)
 
