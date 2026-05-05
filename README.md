@@ -39,9 +39,9 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 - Šířka osy se mění podle zařízení (**CSS `clamp`** na šířku osu).
 
 ### Dokončení a odeslání
-- Tlačítko **„Odeslat výsledky“** se zobrazí až po umístění všech slov aktuální varianty na osu.
-- Po kliknutí se data odešlou na serverovou funkci **`/api/submit`** (Vercel), která je doručí výzkumníkovi **e-mailem** přes **Resend** jako přílohu **`vysledky_[ID].csv`** (UTF-8 s **BOM**, oddělovač **`;`**, řádky seřazené sestupně podle skóre). **Na počítači účastníka se nic nestahuje.**
-- Pokud odeslání selže nebo není server nakonfigurovaný, zobrazí se upozornění a účastník může zkusit odeslat znovu.
+- Po umístění všech slov na osu se zobrazí **„Pokračovat k dotazníku“** → druhá obrazovka s **dotazníkem CRS-15** (15 položek, přesné znění dle škály).
+- Po vyplnění všech otázek tlačítko **„Odeslat výsledky“** odešle **najednou** pod stejným **ID účastníka** na **`/api/submit`** (Vercel) e-mail přes **Resend** se **dvěma přílohami**: **`vysledky_[ID].csv`** (experiment na ose) a **`crs_[ID].csv`** (odpovědi CRS). **Na počítači účastníka se nic nestahuje.**
+- Při chybě odeslání nebo chybějící konfiguraci serveru se zobrazí hláška; u dotazníku lze odeslání zopakovat.
 
 ## Struktura souborů
 
@@ -49,7 +49,8 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 |-----------------|------|
 | `index.html` | Stránky, úvodní formulář (ID + volba 1–6), rozložení experimentu |
 | `style.css` | Vzhled, responzivní layout, osa a karty slov |
-| `script.js` | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, sestavení CSV a odeslání přes API |
+| `script.js` | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, přechod na CRS, odeslání přes API |
+| `crs-questions.js` | Znění otázek a odpovědí CRS-15 (zdroj pro formulář a export) |
 | `api/submit.js` | **Serverless funkce (Vercel):** přijme CSV v JSON a odešle ho e-mailem (Resend) |
 | `package.json` | Závislost `resend` pro e-mailovou funkci |
 
@@ -90,7 +91,9 @@ Pokud **`RESEND_API_KEY`** nebo **`RESULTS_EMAIL`** chybí, API vrátí stav **5
 
 ## Export dat (CSV)
 
-Hlavička souboru obsahuje mimo jiné:
+E-mail obsahuje přílohu **`vysledky_[ID].csv`** (experiment) a při dokončeném CRS i **`crs_[ID].csv`**. V souboru CRS jsou sloupce mimo jiné: číslo otázky, plné znění otázky, index zvolené odpovědi a text odpovědi.
+
+Hlavička souboru experimentu obsahuje mimo jiné:
 
 - **`ID_Ucastnika`** – zadané ID.
 - **`Varianta_Cislo_Ucastnika`** – volba **1–6**, jak ji viděl účastník.

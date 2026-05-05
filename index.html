@@ -48,10 +48,27 @@
         </div>
 
         <div class="footer">
-            <button id="finish-btn" class="hidden btn-save">Odeslat výsledky</button>
+            <button type="button" id="continue-to-crs-btn" class="hidden btn-save">Pokračovat k dotazníku</button>
         </div>
     </div>
 
+    <div id="questionnaire-screen" class="screen hidden">
+        <div class="crs-container">
+            <h1 class="crs-title">DOTAZNÍK RELIGIOZITY (CRS-15)</h1>
+            <p class="crs-lead">
+                Instrukce: Přečtěte si prosím pečlivě následující otázky a u každé z nich zvolte odpověď, která nejlépe vystihuje váš postoj, přesvědčení nebo chování.
+            </p>
+            <div id="crs-error-banner" class="submit-error-banner crs-error-banner" role="alert" hidden></div>
+            <form id="crs-form" novalidate>
+                <div id="crs-form-fields"></div>
+                <div class="crs-footer-actions">
+                    <button type="submit" id="crs-submit-btn" class="btn-save">Odeslat výsledky</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="crs-questions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

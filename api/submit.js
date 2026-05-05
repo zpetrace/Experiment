@@ -6,6 +6,8 @@
  *   RESULTS_EMAIL      příjemce (jedna adresa nebo více oddělených čárkou)
  *   RESEND_FROM        např. "Experiment <experiment@your-domain.cz>" — musí být ověřená doména v Resend
  *                      (pokud není nastaveno, použije se výchozí Resend sandbox — viz dokumentace Resend)
+ *
+ * Volitelně v těle JSON: crsCsv (řetězec CSV s BOM) — druhá příloha CRS-15.
  */
 
 const { Resend } = require("resend");
@@ -55,6 +57,7 @@ module.exports = async (req, res) => {
 
     const participantId = payload.participantId;
     const csv = payload.csv;
+    const crsCsv = typeof payload.crsCsv === "string" ? payload.crsCsv : "";
 
     if (!participantId || typeof participantId !== "string" || typeof csv !== "string") {
         res.status(400).json({ ok: false, error: "Missing participantId or csv" });
@@ -63,6 +66,11 @@ module.exports = async (req, res) => {
 
     if (csv.length > 2_000_000) {
         res.status(413).json({ ok: false, error: "Payload too large" });
+        return;
+    }
+
+    if (crsCsv.length > 500_000) {
+        res.status(413).json({ ok: false, error: "CRS payload too large" });
         return;
     }
 
@@ -78,17 +86,38 @@ module.exports = async (req, res) => {
         return;
     }
 
+    const crsFilename = `crs_${safeId || "ucastnik"}.csv`;
+    const hasCrs = crsCsv.length > 0;
+
+    const defaultSubject = hasCrs
+        ? `Experiment + CRS-15 — účastník ${participantId}`
+        : `Experiment — výsledky účastníka ${participantId}`;
     const subject =
         typeof payload.subject === "string" && payload.subject.trim()
             ? payload.subject.trim()
-            : `Experiment — výsledky účastníka ${participantId}`;
+            : defaultSubject;
 
     const textLines = [
         `ID účastníka: ${participantId}`,
         payload.variantLabel ? `Varianta: ${payload.variantLabel}` : null,
         "",
-        "Kompletní tabulka je v příloze CSV (UTF-8, středník)."
+        hasCrs
+            ? "V příloze: (1) CSV výsledků experimentu na ose slov, (2) CSV odpovědí CRS-15. UTF-8, oddělovač středník."
+            : "V příloze je CSV výsledků experimentu (UTF-8, středník)."
     ].filter(Boolean);
+
+    const attachments = [
+        {
+            filename,
+            content: Buffer.from(csv, "utf8")
+        }
+    ];
+    if (hasCrs) {
+        attachments.push({
+            filename: crsFilename,
+            content: Buffer.from(crsCsv, "utf8")
+        });
+    }
 
     const resend = new Resend(apiKey);
 
@@ -98,12 +127,7 @@ module.exports = async (req, res) => {
             to: toList,
             subject,
             text: textLines.join("\n"),
-            attachments: [
-                {
-                    filename,
-                    content: Buffer.from(csv, "utf8")
-                }
-            ]
+            attachments
         });
 
         if (error) {

@@ -48,12 +48,22 @@ let activeWords = [];
 const placedWordIds = new Set();
 let queueIndex = 0;
 
+/** Snímek CSV z experimentu před přechodem na CRS (odesílá se až s dotazníkem). */
+let pendingExperimentCsvWithBom = null;
+let pendingVariantLabel = null;
+let crsFormBuilt = false;
+
 const introScreen = document.getElementById("intro-screen");
 const experimentScreen = document.getElementById("experiment-screen");
+const questionnaireScreen = document.getElementById("questionnaire-screen");
 const wordsBank = document.getElementById("words-bank");
 const axis = document.getElementById("axis");
 const ticksContainer = document.getElementById("axis-ticks");
-const finishBtn = document.getElementById("finish-btn");
+const continueToCrsBtn = document.getElementById("continue-to-crs-btn");
+const crsForm = document.getElementById("crs-form");
+const crsFormFields = document.getElementById("crs-form-fields");
+const crsSubmitBtn = document.getElementById("crs-submit-btn");
+const crsErrorBanner = document.getElementById("crs-error-banner");
 const variantSelect = document.getElementById("experiment-variant");
 const instructionsText = document.querySelector(".instructions p");
 
@@ -114,10 +124,9 @@ function showNextWordOneByOne() {
 }
 
 function renderWordsForVariant(variantKey) {
-    removeSubmitErrorBanner();
     wordsBank.innerHTML = "";
     axis.querySelectorAll(".word").forEach((word) => word.remove());
-    finishBtn.classList.add("hidden");
+    continueToCrsBtn.classList.add("hidden");
     placedWordIds.clear();
     queueIndex = 0;
     activeWords = shuffleArray(getFilteredWords(variantKey));
@@ -151,6 +160,14 @@ document.getElementById("start-btn").addEventListener("click", () => {
     selectedVariantKey = variants[chosen] ? chosen : "all-at-once-all";
     updateInstructions(selectedVariantKey);
     renderWordsForVariant(selectedVariantKey);
+
+    pendingExperimentCsvWithBom = null;
+    pendingVariantLabel = null;
+    crsFormBuilt = false;
+    crsFormFields.replaceChildren();
+    crsForm.reset();
+    hideCrsError();
+    questionnaireScreen.classList.add("hidden");
 
     introScreen.classList.add("hidden");
     experimentScreen.classList.remove("hidden");
@@ -197,31 +214,26 @@ axis.addEventListener("drop", (e) => {
 
 function checkAllPlaced() {
     if (placedWordIds.size === activeWords.length && activeWords.length > 0) {
-        finishBtn.classList.remove("hidden");
-        // Po přidání tlačítka může být patička pod ohybem okna (100svh + overflow dříve hidden).
+        continueToCrsBtn.classList.remove("hidden");
         requestAnimationFrame(() => {
-            finishBtn.scrollIntoView({ behavior: "smooth", block: "end" });
+            continueToCrsBtn.scrollIntoView({ behavior: "smooth", block: "end" });
         });
     }
 }
 
-function removeSubmitErrorBanner() {
-    document.getElementById("submit-error-banner")?.remove();
+function hideCrsError() {
+    if (!crsErrorBanner) return;
+    crsErrorBanner.hidden = true;
+    crsErrorBanner.textContent = "";
 }
 
-function showSubmitErrorBanner(message) {
-    removeSubmitErrorBanner();
-    const banner = document.createElement("div");
-    banner.id = "submit-error-banner";
-    banner.className = "submit-error-banner";
-    banner.setAttribute("role", "alert");
-    banner.textContent = message;
-    const instructionsBlock = document.querySelector("#experiment-screen .instructions");
-    instructionsBlock?.insertAdjacentElement("afterend", banner);
+function showCrsError(message) {
+    if (!crsErrorBanner) return;
+    crsErrorBanner.textContent = message;
+    crsErrorBanner.hidden = false;
 }
 
-// --- 4. Odeslání výsledků (Vercel /api/submit → e-mail přes Resend, bez stahování souboru) ---
-finishBtn.addEventListener("click", async () => {
+function buildExperimentExport() {
     const results = [];
     axis.querySelectorAll(".word").forEach((w) => {
         results.push({
@@ -230,8 +242,6 @@ finishBtn.addEventListener("click", async () => {
             score: parseFloat(w.dataset.score)
         });
     });
-
-    // Seřazení výsledků od největšího (50) po nejmenšího (-50)
     results.sort((a, b) => b.score - a.score);
 
     const v = variants[selectedVariantKey];
@@ -246,10 +256,122 @@ finishBtn.addEventListener("click", async () => {
         csv += `${participantId};${participantVariantNumber};${selectedVariantKey};${v.label};${categoriesInSession};${r.category};${r.word};${r.score}\n`;
     });
 
-    const csvWithBom = `\uFEFF${csv}`;
+    return { csvWithBom: `\uFEFF${csv}`, variantLabel: v.label };
+}
 
-    removeSubmitErrorBanner();
-    finishBtn.disabled = true;
+function crsCsvEscape(value) {
+    const t = String(value).replace(/\r?\n/g, " ").replace(/"/g, '""');
+    return `"${t}"`;
+}
+
+function collectCrsAnswersOrError() {
+    if (typeof CRS_QUESTIONS === "undefined" || !Array.isArray(CRS_QUESTIONS)) {
+        return { error: "Chybí data dotazníku (CRS). Obnovte stránku." };
+    }
+    for (const q of CRS_QUESTIONS) {
+        const checked = document.querySelector(`input[name="crs_q${q.id}"]:checked`);
+        if (!checked) {
+            return { error: `Prosím doplňte odpověď na otázku č. ${q.id}.` };
+        }
+    }
+    return { error: null };
+}
+
+function buildCrsCsv() {
+    const header = "ID_Ucastnika;CRS_Otazka_cislo;CRS_Otazka;CRS_index_odpovede;CRS_odpoved_text";
+    const rows = [header];
+    for (const q of CRS_QUESTIONS) {
+        const checked = document.querySelector(`input[name="crs_q${q.id}"]:checked`);
+        const idx = parseInt(checked.value, 10);
+        const text = q.options[idx];
+        rows.push(
+            [
+                participantId,
+                q.id,
+                q.text,
+                idx,
+                text
+            ]
+                .map(crsCsvEscape)
+                .join(";")
+        );
+    }
+    return `\uFEFF${rows.join("\n")}\n`;
+}
+
+function renderCrsForm() {
+    if (typeof CRS_QUESTIONS === "undefined") return;
+    crsFormFields.replaceChildren();
+    CRS_QUESTIONS.forEach((q) => {
+        const fieldset = document.createElement("fieldset");
+        fieldset.className = "crs-fieldset";
+
+        const legend = document.createElement("legend");
+        legend.className = "crs-legend";
+        legend.textContent = `${q.id}. ${q.text}`;
+        fieldset.appendChild(legend);
+
+        q.options.forEach((optLabel, optIdx) => {
+            const row = document.createElement("div");
+            row.className = "crs-option";
+            const inputId = `crs-q${q.id}-opt${optIdx}`;
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = `crs_q${q.id}`;
+            input.value = String(optIdx);
+            input.id = inputId;
+            if (optIdx === 0) input.required = true;
+
+            const label = document.createElement("label");
+            label.htmlFor = inputId;
+            label.textContent = optLabel;
+
+            row.appendChild(input);
+            row.appendChild(label);
+            fieldset.appendChild(row);
+        });
+
+        crsFormFields.appendChild(fieldset);
+    });
+}
+
+// --- 4a. Po dokončení osy → dotazník CRS-15 ---
+continueToCrsBtn.addEventListener("click", () => {
+    hideCrsError();
+    const exp = buildExperimentExport();
+    pendingExperimentCsvWithBom = exp.csvWithBom;
+    pendingVariantLabel = exp.variantLabel;
+
+    experimentScreen.classList.add("hidden");
+    questionnaireScreen.classList.remove("hidden");
+
+    if (!crsFormBuilt) {
+        renderCrsForm();
+        crsFormBuilt = true;
+    }
+
+    window.scrollTo(0, 0);
+});
+
+// --- 4b. Odeslání experimentu + CRS jedním e-mailem (Vercel /api/submit) ---
+crsForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideCrsError();
+
+    const check = collectCrsAnswersOrError();
+    if (check.error) {
+        showCrsError(check.error);
+        return;
+    }
+
+    if (!pendingExperimentCsvWithBom || !pendingVariantLabel) {
+        showCrsError("Chybí data z experimentu. Vraťte se prosím zpět — obnovte stránku a zopakujte úlohu.");
+        return;
+    }
+
+    const crsCsvWithBom = buildCrsCsv();
+
+    crsSubmitBtn.disabled = true;
 
     let emailStatus = "skipped";
     try {
@@ -258,8 +380,9 @@ finishBtn.addEventListener("click", async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 participantId,
-                csv: csvWithBom,
-                variantLabel: v.label
+                csv: pendingExperimentCsvWithBom,
+                variantLabel: pendingVariantLabel,
+                crsCsv: crsCsvWithBom
             })
         });
         const submitJson = await submitRes.json().catch(() => ({}));
@@ -275,28 +398,31 @@ finishBtn.addEventListener("click", async () => {
         emailStatus = "failed";
     }
 
+    crsSubmitBtn.disabled = false;
+
     if (emailStatus === "sent") {
-        experimentScreen.replaceChildren();
-
-        const heading = document.createElement("h1");
-        heading.textContent = "Hotovo!";
-        experimentScreen.appendChild(heading);
-
-        const thanks = document.createElement("p");
-        thanks.textContent =
-            "Děkujeme. Vaše odpovědi byly odeslány výzkumníkovi e-mailem. Můžete zavřít okno prohlížeče.";
-        experimentScreen.appendChild(thanks);
+        const container = questionnaireScreen.querySelector(".crs-container");
+        if (container) {
+            container.replaceChildren();
+            const heading = document.createElement("h1");
+            heading.className = "crs-title";
+            heading.textContent = "Hotovo!";
+            const thanks = document.createElement("p");
+            thanks.className = "crs-lead";
+            thanks.textContent =
+                "Děkujeme. Odpovědi z experimentu i z dotazníku CRS-15 byly odeslány výzkumníkovi pod vaším identifikačním číslem. Můžete zavřít okno prohlížeče.";
+            container.appendChild(heading);
+            container.appendChild(thanks);
+        }
         return;
     }
 
-    finishBtn.disabled = false;
-
     if (emailStatus === "skipped") {
-        showSubmitErrorBanner(
+        showCrsError(
             "Odeslání na server není nastavené. Informujte prosím výzkumníka (chybí konfigurace e-mailu na serveru)."
         );
     } else {
-        showSubmitErrorBanner(
+        showCrsError(
             "Odeslání se nepodařilo. Zkuste prosím znovu kliknout na „Odeslat výsledky“. Pokud to nepomůže, informujte výzkumníka."
         );
     }
