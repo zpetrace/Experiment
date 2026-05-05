@@ -1,12 +1,56 @@
+/** Each item: Czech + English surface form (same stimulus, two languages). */
 const wordsByCategory = {
-    bad: ["Násilí", "Válka", "Lež", "Manipulace", "Pomsta", "Zrada", "Útlak", "Krutost", "Prázdnota", "Závist"],
-    good: ["Péče", "Objetí", "Komunita", "Vítězství", "Soucit", "Úspěch", "Statečnost", "Naděje", "Svoboda", "Harmonie"],
-    neutral: ["Vědomost", "Zákon", "Změna", "Kontrast", "Hranice", "Vztah", "Názor", "List", "Strom", "Dualita"]
+    bad: [
+        { cs: "Násilí", en: "Violence" },
+        { cs: "Válka", en: "War" },
+        { cs: "Lež", en: "Lie" },
+        { cs: "Manipulace", en: "Manipulation" },
+        { cs: "Pomsta", en: "Revenge" },
+        { cs: "Zrada", en: "Betrayal" },
+        { cs: "Útlak", en: "Oppression" },
+        { cs: "Krutost", en: "Cruelty" },
+        { cs: "Prázdnota", en: "Emptiness" },
+        { cs: "Závist", en: "Envy" }
+    ],
+    good: [
+        { cs: "Péče", en: "Care" },
+        { cs: "Objetí", en: "Embrace" },
+        { cs: "Komunita", en: "Community" },
+        { cs: "Vítězství", en: "Victory" },
+        { cs: "Soucit", en: "Compassion" },
+        { cs: "Úspěch", en: "Success" },
+        { cs: "Statečnost", en: "Courage" },
+        { cs: "Naděje", en: "Hope" },
+        { cs: "Svoboda", en: "Freedom" },
+        { cs: "Harmonie", en: "Harmony" }
+    ],
+    neutral: [
+        { cs: "Vědomost", en: "Knowledge" },
+        { cs: "Zákon", en: "Law" },
+        { cs: "Změna", en: "Change" },
+        { cs: "Kontrast", en: "Contrast" },
+        { cs: "Hranice", en: "Boundary" },
+        { cs: "Vztah", en: "Relationship" },
+        { cs: "Názor", en: "Opinion" },
+        { cs: "List", en: "Leaf" },
+        { cs: "Strom", en: "Tree" },
+        { cs: "Dualita", en: "Duality" }
+    ]
 };
 
-const wordsData = Object.entries(wordsByCategory).flatMap(([category, words]) =>
-    words.map((text) => ({ text, category }))
+const wordsData = Object.entries(wordsByCategory).flatMap(([category, items]) =>
+    items.map((pair, index) => ({
+        id: `${category}-${index}`,
+        category,
+        textCs: pair.cs,
+        textEn: pair.en
+    }))
 );
+
+function getWordDisplayLabel(wordObj) {
+    const lang = typeof ExperimentI18n !== "undefined" ? ExperimentI18n.getLang() : "cs";
+    return lang === "en" ? wordObj.textEn : wordObj.textCs;
+}
 
 const variants = {
     "all-at-once-all": {
@@ -59,13 +103,13 @@ const questionnaireScreen = document.getElementById("questionnaire-screen");
 const wordsBank = document.getElementById("words-bank");
 const axis = document.getElementById("axis");
 const ticksContainer = document.getElementById("axis-ticks");
-const continueToCrsBtn = document.getElementById("continue-to-crs-btn");
+const continueToCrsBtn = document.getElementById("i18n-continue-crs-btn");
 const crsForm = document.getElementById("crs-form");
 const crsFormFields = document.getElementById("crs-form-fields");
-const crsSubmitBtn = document.getElementById("crs-submit-btn");
+const crsSubmitBtn = document.getElementById("i18n-crs-submit-btn");
 const crsErrorBanner = document.getElementById("crs-error-banner");
 const variantSelect = document.getElementById("experiment-variant");
-const instructionsText = document.querySelector(".instructions p");
+const instructionsText = document.getElementById("i18n-exp-instructions-p");
 
 // --- 1. VYTVOŘENÍ STUPNICE NA OSE (-50 až 50) ---
 function createTicks() {
@@ -77,14 +121,6 @@ function createTicks() {
     }
 }
 createTicks();
-
-function sanitizeForId(value) {
-    return value
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-zA-Z0-9_-]/g, "-")
-        .toLowerCase();
-}
 
 function getFilteredWords(variantKey) {
     const variant = variants[variantKey];
@@ -103,9 +139,9 @@ function shuffleArray(items) {
 function createWordElement(wordObj) {
     const el = document.createElement("div");
     el.className = "word";
-    el.textContent = wordObj.text;
+    el.textContent = getWordDisplayLabel(wordObj);
     el.draggable = true;
-    el.id = `word-${sanitizeForId(wordObj.text)}`;
+    el.id = `word-${wordObj.id}`;
     el.dataset.category = wordObj.category;
 
     el.addEventListener("dragstart", (e) => {
@@ -140,20 +176,18 @@ function renderWordsForVariant(variantKey) {
 }
 
 function updateInstructions(variantKey) {
+    if (!instructionsText || typeof ExperimentI18n === "undefined") return;
     const variant = variants[variantKey];
-    if (variant.mode === "all-at-once") {
-        instructionsText.textContent =
-            "Seřaďte všechna zobrazená slova na vertikální osu. Pozici můžete upravit opětovným přetažením.";
-    } else {
-        instructionsText.textContent =
-            "Seřaďte každé zobrazené slovo na vertikální osu. Pozici můžete upravit opětovným přetažením.";
-    }
+    const key = variant.mode === "all-at-once" ? "instr_exp_all" : "instr_exp_one";
+    instructionsText.textContent = ExperimentI18n.t(key);
+    const h3 = document.getElementById("i18n-exp-sidebar-h3");
+    if (h3) h3.textContent = ExperimentI18n.t("sidebar_words_heading");
 }
 
 // --- 2. START EXPERIMENTU ---
-document.getElementById("start-btn").addEventListener("click", () => {
+document.getElementById("i18n-start-btn").addEventListener("click", () => {
     const id = document.getElementById("participant-id").value.trim();
-    if (!id) return alert("Zadejte ID účastníka");
+    if (!id) return alert(ExperimentI18n.t("alert_no_id"));
 
     participantId = id;
     const chosen = variantSelect.value;
@@ -250,10 +284,12 @@ function buildExperimentExport() {
         variantSelect.selectedOptions[0].textContent.trim() ||
         String(Array.from(variantSelect.options).findIndex((o) => o.value === selectedVariantKey) + 1);
 
+    const uiLang = typeof ExperimentI18n !== "undefined" ? ExperimentI18n.getLang() : "cs";
+
     let csv =
-        "ID_Ucastnika;Varianta_Cislo_Ucastnika;Varianta_Klic;Varianta_Popis;Kategorie_V_Session;Slovo_Kategorie;Slovo;Body_Moc\n";
+        "ID_Ucastnika;Jazyk_rozhrani;Varianta_Cislo_Ucastnika;Varianta_Klic;Varianta_Popis;Kategorie_V_Session;Slovo_Kategorie;Slovo;Body_Moc\n";
     results.forEach((r) => {
-        csv += `${participantId};${participantVariantNumber};${selectedVariantKey};${v.label};${categoriesInSession};${r.category};${r.word};${r.score}\n`;
+        csv += `${participantId};${uiLang};${participantVariantNumber};${selectedVariantKey};${v.label};${categoriesInSession};${r.category};${r.word};${r.score}\n`;
     });
 
     return { csvWithBom: `\uFEFF${csv}`, variantLabel: v.label };
@@ -264,45 +300,47 @@ function crsCsvEscape(value) {
     return `"${t}"`;
 }
 
+function getCrsQuestions() {
+    if (typeof CRS_QUESTIONS_BY_LANG === "undefined") return [];
+    const lang = typeof ExperimentI18n !== "undefined" ? ExperimentI18n.getLang() : "cs";
+    return CRS_QUESTIONS_BY_LANG[lang] || CRS_QUESTIONS_BY_LANG.cs || [];
+}
+
 function collectCrsAnswersOrError() {
-    if (typeof CRS_QUESTIONS === "undefined" || !Array.isArray(CRS_QUESTIONS)) {
-        return { error: "Chybí data dotazníku (CRS). Obnovte stránku." };
+    const list = getCrsQuestions();
+    if (!list.length) {
+        return { error: ExperimentI18n.t("crs_err_bundle") };
     }
-    for (const q of CRS_QUESTIONS) {
+    for (const q of list) {
         const checked = document.querySelector(`input[name="crs_q${q.id}"]:checked`);
         if (!checked) {
-            return { error: `Prosím doplňte odpověď na otázku č. ${q.id}.` };
+            return { error: ExperimentI18n.t("crs_err_missing_answer", { n: q.id }) };
         }
     }
     return { error: null };
 }
 
 function buildCrsCsv() {
-    const header = "ID_Ucastnika;CRS_Otazka_cislo;CRS_Otazka;CRS_index_odpovede;CRS_odpoved_text";
+    const uiLang = typeof ExperimentI18n !== "undefined" ? ExperimentI18n.getLang() : "cs";
+    const header =
+        "ID_Ucastnika;Jazyk_rozhrani;CRS_Otazka_cislo;CRS_Otazka;CRS_index_odpovede;CRS_odpoved_text";
     const rows = [header];
-    for (const q of CRS_QUESTIONS) {
+    for (const q of getCrsQuestions()) {
         const checked = document.querySelector(`input[name="crs_q${q.id}"]:checked`);
         const idx = parseInt(checked.value, 10);
         const text = q.options[idx];
         rows.push(
-            [
-                participantId,
-                q.id,
-                q.text,
-                idx,
-                text
-            ]
-                .map(crsCsvEscape)
-                .join(";")
+            [participantId, uiLang, q.id, q.text, idx, text].map(crsCsvEscape).join(";")
         );
     }
     return `\uFEFF${rows.join("\n")}\n`;
 }
 
 function renderCrsForm() {
-    if (typeof CRS_QUESTIONS === "undefined") return;
+    const list = getCrsQuestions();
+    if (!list.length) return;
     crsFormFields.replaceChildren();
-    CRS_QUESTIONS.forEach((q) => {
+    list.forEach((q) => {
         const fieldset = document.createElement("fieldset");
         fieldset.className = "crs-fieldset";
 
@@ -333,6 +371,9 @@ function renderCrsForm() {
 
         crsFormFields.appendChild(fieldset);
     });
+    if (typeof ExperimentI18n !== "undefined") {
+        ExperimentI18n.applyUiLanguage();
+    }
 }
 
 // --- 4a. Po dokončení osy → dotazník CRS-15 ---
@@ -365,7 +406,7 @@ crsForm.addEventListener("submit", async (e) => {
     }
 
     if (!pendingExperimentCsvWithBom || !pendingVariantLabel) {
-        showCrsError("Chybí data z experimentu. Vraťte se prosím zpět — obnovte stránku a zopakujte úlohu.");
+        showCrsError(ExperimentI18n.t("crs_err_missing_experiment"));
         return;
     }
 
@@ -406,11 +447,10 @@ crsForm.addEventListener("submit", async (e) => {
             container.replaceChildren();
             const heading = document.createElement("h1");
             heading.className = "crs-title";
-            heading.textContent = "Hotovo!";
+            heading.textContent = ExperimentI18n.t("crs_done_title");
             const thanks = document.createElement("p");
             thanks.className = "crs-lead";
-            thanks.textContent =
-                "Děkujeme. Odpovědi z experimentu i z dotazníku CRS-15 byly odeslány výzkumníkovi pod vaším identifikačním číslem. Můžete zavřít okno prohlížeče.";
+            thanks.textContent = ExperimentI18n.t("crs_done_body");
             container.appendChild(heading);
             container.appendChild(thanks);
         }
@@ -418,12 +458,8 @@ crsForm.addEventListener("submit", async (e) => {
     }
 
     if (emailStatus === "skipped") {
-        showCrsError(
-            "Odeslání na server není nastavené. Informujte prosím výzkumníka (chybí konfigurace e-mailu na serveru)."
-        );
+        showCrsError(ExperimentI18n.t("crs_email_not_configured"));
     } else {
-        showCrsError(
-            "Odeslání se nepodařilo. Zkuste prosím znovu kliknout na „Odeslat výsledky“. Pokud to nepomůže, informujte výzkumníka."
-        );
+        showCrsError(ExperimentI18n.t("crs_email_send_failed"));
     }
 });

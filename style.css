@@ -35,6 +35,50 @@ body {
     text-align: center;
 }
 
+.lang-switch-wrap {
+    margin: 0 0 16px 0;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+.lang-hint {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.lang-switch {
+    display: inline-flex;
+    gap: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    background: #fff;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.lang-btn:hover {
+    background: #f1f5f9;
+}
+
+.lang-btn-active {
+    background: var(--primary);
+    color: #fff;
+}
+
+.lang-btn-active:hover {
+    background: #1d4ed8;
+    color: #fff;
+}
+
 /* Experiment: celá osa v rámci okna; po zobrazení tlačítka „Uložit“ musí jít dostat k patičce (viz overflow). */
 #experiment-screen.screen {
     justify-content: flex-start;
