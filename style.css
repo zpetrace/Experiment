@@ -215,6 +215,17 @@ button {
 
 .btn-save { background: #1e293b; margin-top: 20px; }
 
+.submit-error-banner {
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
 /* Na úzkých displejích pod sebou: slova nahoře (scrollovatelná oblast), osa do zbytku výšky okna */
 @media (max-width: 720px) {
     .main-layout {
