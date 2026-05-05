@@ -3,7 +3,8 @@
     --success: #059669;
     --bg: #f8fafc;
     --text: #1e293b;
-    --axis-height: 700px;
+    /* Šířka osy podle zařízení; výška se řídí layoutem (celá osa ve výřezu okna) */
+    --axis-width: clamp(112px, 26vw, 220px);
 }
 
 body {
@@ -34,43 +35,71 @@ body {
     text-align: center;
 }
 
+/* Experiment: celá osa od +50 do −50 viditelná najednou (bez skrollování stránky pro osu) */
+#experiment-screen.screen {
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 12px 16px 16px;
+    box-sizing: border-box;
+    height: 100svh;
+    max-height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#experiment-screen .footer {
+    flex-shrink: 0;
+    padding-top: 8px;
+}
+
 /* Layout experimentu */
 .main-layout {
     display: flex;
-    gap: 40px;
+    gap: clamp(16px, 3vw, 32px);
     width: 100%;
-    max-width: 1100px;
-    align-items: flex-start;
+    max-width: 1280px;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+    margin: 0 auto;
 }
 
 .sidebar {
-    flex: 1;
+    flex: 0 1 min(380px, 42vw);
+    min-width: min(240px, 100%);
     background: white;
-    padding: 25px;
+    padding: 16px 18px;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
 }
 
 .words-bank {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 20px;
-    min-height: 200px;
+    margin-top: 16px;
+    min-height: min(160px, 22svh);
 }
 
 /* Vertikální Osa - HLAVNÍ ZMĚNA */
 .axis-area {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
 }
 
 .axis-container {
     display: flex;
-    height: var(--axis-height);
+    flex: 1;
+    min-height: 0;
+    align-items: stretch;
     position: relative;
-    padding-right: 60px;
+    padding-right: clamp(48px, 8vw, 72px);
 }
 
 /* Stupnice (čísla) */
@@ -78,14 +107,19 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex: 0 0 auto;
     padding-right: 15px;
     font-weight: bold;
     color: #64748b;
     text-align: right;
+    align-self: stretch;
 }
 
 .axis {
-    width: 120px;
+    flex: 0 0 var(--axis-width);
+    width: var(--axis-width);
+    align-self: stretch;
+    min-height: 0;
     background: #f1f5f9;
     border: 2px solid #cbd5e1;
     border-radius: 8px;
@@ -118,11 +152,25 @@ body {
 
 .word.in-axis {
     position: absolute;
-    width: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: min(148px, calc(var(--axis-width) + 40px));
+    min-width: 56px;
     text-align: center;
+    line-height: 1.2;
+    word-break: break-word;
 }
 
-.word:active { cursor: grabbing; transform: scale(1.05); }
+.word:not(.in-axis):active {
+    cursor: grabbing;
+    transform: scale(1.05);
+}
+
+.word.in-axis:active {
+    cursor: grabbing;
+    transform: translateX(-50%) scale(1.05);
+}
 
 /* Tlačítka */
 input[type="text"] {
@@ -132,6 +180,24 @@ input[type="text"] {
     border: 2px solid #e2e8f0;
     border-radius: 6px;
     font-size: 1rem;
+}
+
+label {
+    display: block;
+    text-align: left;
+    width: 80%;
+    margin: 0 auto 8px auto;
+    font-weight: 600;
+}
+
+select {
+    width: 80%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: #fff;
 }
 
 button {
@@ -145,3 +211,22 @@ button {
 }
 
 .btn-save { background: #1e293b; margin-top: 20px; }
+
+/* Na úzkých displejích pod sebou: slova nahoře (scrollovatelná oblast), osa do zbytku výšky okna */
+@media (max-width: 720px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        flex: 0 1 auto;
+        max-height: min(38svh, 280px);
+        max-width: none;
+        width: 100%;
+    }
+
+    .axis-area {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+}
