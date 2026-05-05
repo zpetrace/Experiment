@@ -197,6 +197,10 @@ axis.addEventListener("drop", (e) => {
 function checkAllPlaced() {
     if (placedWordIds.size === activeWords.length && activeWords.length > 0) {
         finishBtn.classList.remove("hidden");
+        // Po přidání tlačítka může být patička pod ohybem okna (100svh + overflow dříve hidden).
+        requestAnimationFrame(() => {
+            finishBtn.scrollIntoView({ behavior: "smooth", block: "end" });
+        });
     }
 }
 

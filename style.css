@@ -35,7 +35,7 @@ body {
     text-align: center;
 }
 
-/* Experiment: celá osa od +50 do −50 viditelná najednou (bez skrollování stránky pro osu) */
+/* Experiment: celá osa v rámci okna; po zobrazení tlačítka „Uložit“ musí jít dostat k patičce (viz overflow). */
 #experiment-screen.screen {
     justify-content: flex-start;
     align-items: stretch;
@@ -44,12 +44,15 @@ body {
     height: 100svh;
     max-height: 100svh;
     min-height: 0;
-    overflow: hidden;
+    /* hidden by ořízl patičku s tlačítkem, jakmile se po dokončení objeví (footer předtím měl nulovou výšku) */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #experiment-screen .footer {
     flex-shrink: 0;
     padding-top: 8px;
+    scroll-margin-bottom: 24px;
 }
 
 /* Layout experimentu */
