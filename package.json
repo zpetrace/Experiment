@@ -1,0 +1,12 @@
+{
+  "name": "experiment-word-axis",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static experiment UI + Vercel API route pro e-mailem výsledky",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "resend": "^4.0.1"
+  }
+}

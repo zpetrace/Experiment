@@ -200,8 +200,8 @@ function checkAllPlaced() {
     }
 }
 
-// --- 4. EXPORT DAT ---
-finishBtn.addEventListener("click", () => {
+// --- 4. EXPORT DAT (+ odeslání na Vercel /api/submit → e-mail přes Resend) ---
+finishBtn.addEventListener("click", async () => {
     const results = [];
     axis.querySelectorAll(".word").forEach((w) => {
         results.push({
@@ -227,7 +227,35 @@ finishBtn.addEventListener("click", () => {
         csv += `${participantId};${participantVariantNumber};${selectedVariantKey};${v.label};${categoriesInSession};${r.category};${r.word};${r.score}\n`;
     });
 
-    // Stažení s BOM kvůli češtině v Excelu
+    const csvWithBom = `\uFEFF${csv}`;
+
+    finishBtn.disabled = true;
+
+    let emailStatus = "skipped";
+    try {
+        const submitRes = await fetch("/api/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                participantId,
+                csv: csvWithBom,
+                variantLabel: v.label
+            })
+        });
+        const submitJson = await submitRes.json().catch(() => ({}));
+
+        if (submitRes.ok && submitJson.ok) {
+            emailStatus = "sent";
+        } else if (submitRes.status === 503 && submitJson.code === "not_configured") {
+            emailStatus = "skipped";
+        } else {
+            emailStatus = "failed";
+        }
+    } catch {
+        emailStatus = "failed";
+    }
+
+    // Stažení s BOM kvůli češtině v Excelu (záloha u účastníka)
     const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -236,5 +264,35 @@ finishBtn.addEventListener("click", () => {
     link.click();
     document.body.removeChild(link);
 
-    experimentScreen.innerHTML = `<h1>Hotovo!</h1><p>Data účastníka ${participantId} byla stažena do vašeho počítače.</p>`;
+    experimentScreen.replaceChildren();
+
+    const heading = document.createElement("h1");
+    heading.textContent = "Hotovo!";
+    experimentScreen.appendChild(heading);
+
+    const thanks = document.createElement("p");
+    thanks.appendChild(document.createTextNode("Děkujeme. Kopie dat ("));
+    const codeEl = document.createElement("code");
+    codeEl.textContent = `vysledky_${participantId}.csv`;
+    thanks.appendChild(codeEl);
+    thanks.appendChild(document.createTextNode(") byla stažena do vašeho počítače."));
+    experimentScreen.appendChild(thanks);
+
+    if (emailStatus === "sent") {
+        const emailOkEl = document.createElement("p");
+        emailOkEl.textContent =
+            "Výsledky byly zároveň odeslány výzkumníkovi na zadaný e-mail serveru.";
+        experimentScreen.appendChild(emailOkEl);
+    } else if (emailStatus === "failed") {
+        const emailFailEl = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = "Automatické odeslání e-mailem se nepodařilo.";
+        emailFailEl.appendChild(strong);
+        emailFailEl.appendChild(
+            document.createTextNode(
+                " Soubor byl stažen do vašeho počítače — uchovejte ho prosím nebo ho výzkumníkovi předejte."
+            )
+        );
+        experimentScreen.appendChild(emailFailEl);
+    }
 });

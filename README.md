@@ -41,20 +41,52 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 ### Dokončení a export
 - Tlačítko **„Uložit a stáhnout data“** se zobrazí až po umístění všech slov aktuální varianty na osu.
 - Vygeneruje se soubor **`vysledky_[ID].csv`** (UTF-8 s **BOM** kvůli Excelu), oddělovač polí **`;`**, řádky seřazené **sestupně podle skóre**.
+- Při nasazení na **Vercel** se stejná data po dokončení navíc pokusí odeslat na serverovou funkci **`/api/submit`**, která je doručí na váš e-mail přes službu **Resend** (viz níže). Lokální otevření bez této služby pouze stáhne CSV.
 
 ## Struktura souborů
 
-| Soubor       | Účel |
-|--------------|------|
+| Soubor / složka | Účel |
+|-----------------|------|
 | `index.html` | Stránky, úvodní formulář (ID + volba 1–6), rozložení experimentu |
-| `style.css`  | Vzhled, responzivní layout, osa a karty slov |
-| `script.js`  | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, CSV export |
+| `style.css` | Vzhled, responzivní layout, osa a karty slov |
+| `script.js` | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, CSV export a volání API |
+| `api/submit.js` | **Serverless funkce (Vercel):** přijme CSV v JSON a odešle ho e-mailem (Resend) |
+| `package.json` | Závislost `resend` pro e-mailovou funkci |
 
 ## Jak aplikaci spustit
 
 1. Otevřete složku projektu v počítači.
 2. **Nejjednodušeji:** dvojklik na **`index.html`** v prohlížeči (některé prohlížeče omezují lokální skripty; pokud něco nefunguje, použijte lokální server).
 3. **Spolehlivěji:** lokální HTTP server (např. rozšíření Live Server ve VS Code / Cursor, nebo `python -m http.server` ve složce projektu).
+4. **S e-mailem výsledků:** spusťte `npm install`, zkopírujte **`.env.example`** na **`.env.local`**, doplňte klíče a spusťte **`vercel dev`** v kořeni projektu — pak `fetch("/api/submit")` funguje lokálně stejně jako na produkci.
+
+## Nasazení na Vercel a odesílání výsledků e-mailem (Resend)
+
+Webové rozhraní zůstává statické; na Vercelu se nasazuje i složka **`api/`** jako serverless funkce.
+
+### Postup na Vercelu
+
+1. Účet na [vercel.com](https://vercel.com), propojení s Git repozitářem nebo nasazení příkazem `vercel`.
+2. **Root projektu** = kořen s `index.html` a `package.json`. Při deployi Vercel spustí **`npm install`** a nasadí funkci **`/api/submit`**.
+3. V projektu na Vercelu: **Settings → Environment Variables** nastavte:
+
+| Proměnná | Význam |
+|----------|--------|
+| **`RESEND_API_KEY`** | API klíč z [resend.com/api-keys](https://resend.com/api-keys) |
+| **`RESULTS_EMAIL`** | Adresa(y), kam mají chodit CSV (více adres oddělte čárkou) |
+| **`RESEND_FROM`** *(doporučeno)* | Odesílatel podle formátu Resend (např. „Experiment“ + ověřená doména). Bez ověřené domény používejte nejdřív jejich návod v dokumentaci; jinak zůstává omezený sandbox režim. |
+
+   Pokud **`RESEND_FROM`** nenastavíte, funkce použije výchozí sandbox adresu Resend — ta má **přísná omezení** (typicky jen na váš vlastní ověřený účet). Do ostrého sběru dat počítejte s **ověřenou doménou** a vlastním **`RESEND_FROM`**.
+
+4. Po nasazení ověřte dokončení experimentu v anonymním okně; v doručené poště by měl být přílohou soubor **`vysledky_[ID].csv`**.
+
+### Chráněné údaje (GDPR)
+
+Do e-mailu i CSV jdou identifikátor účastníka a jeho odpovědi. Používejte ID tak, aby **nešlo snadno spojit s konkrétní osobou**, pokud to váš etický protokol vyžaduje, a uchovávejte data podle pravidel školy / GDPR.
+
+### Bez nastavení env proměnných
+
+Pokud **`RESEND_API_KEY`** nebo **`RESULTS_EMAIL`** chybí, API vrátí stav **503** a účastník **u sebe stejně stáhne CSV**; na konci se nezobrazí potvrzení o e-mailu (nebo se zobrazí varování při chybě odeslání).
 
 ## Export dat (CSV)
 
