@@ -9,10 +9,17 @@
 <body>
     <div id="intro-screen" class="screen">
         <div class="card shadow">
-            <h1>Experiment</h1>
-            <p>Zadejte prosím své identifikační číslo:</p>
+            <h1 id="i18n-intro-title">Experiment</h1>
+            <p class="lang-switch-wrap">
+                <span id="i18n-lang-hint" class="lang-hint">Jazyk rozhraní:</span>
+                <span class="lang-switch" role="group" aria-label="Language">
+                    <button type="button" id="lang-btn-cs" class="lang-btn" data-lang-btn="cs" aria-pressed="true">Čeština</button>
+                    <button type="button" id="lang-btn-en" class="lang-btn" data-lang-btn="en" aria-pressed="false">English</button>
+                </span>
+            </p>
+            <p id="i18n-intro-id-prompt">Zadejte prosím své identifikační číslo:</p>
             <input type="text" id="participant-id" placeholder="ID účastníka" autocomplete="off">
-            <label for="experiment-variant">Vyberte variantu:</label>
+            <label id="i18n-intro-variant-label" for="experiment-variant">Vyberte variantu:</label>
             <select id="experiment-variant">
                 <option value="all-at-once-all">1</option>
                 <option value="all-at-once-neutral-good">2</option>
@@ -21,7 +28,7 @@
                 <option value="one-by-one-neutral-good">5</option>
                 <option value="one-by-one-neutral-bad">6</option>
             </select>
-            <button id="start-btn">Vstoupit do experimentu</button>
+            <button type="button" id="i18n-start-btn">Vstoupit do experimentu</button>
         </div>
     </div>
 
@@ -29,8 +36,8 @@
         <div class="main-layout">
             <div class="sidebar">
                 <div class="instructions">
-                    <h3>Slova k roztřídění</h3>
-                    <p>Seřaďte slova k roztřídění na vertikální osu.</p>
+                    <h3 id="i18n-exp-sidebar-h3">Slova k roztřídění</h3>
+                    <p id="i18n-exp-instructions-p">Seřaďte slova k roztřídění na vertikální osu.</p>
                 </div>
                 <div class="words-bank" id="words-bank">
                     </div>
@@ -48,26 +55,27 @@
         </div>
 
         <div class="footer">
-            <button type="button" id="continue-to-crs-btn" class="hidden btn-save">Pokračovat k dotazníku</button>
+            <button type="button" id="i18n-continue-crs-btn" class="hidden btn-save">Pokračovat k dotazníku</button>
         </div>
     </div>
 
     <div id="questionnaire-screen" class="screen hidden">
         <div class="crs-container">
-            <h1 class="crs-title">DOTAZNÍK RELIGIOZITY (CRS-15)</h1>
-            <p class="crs-lead">
+            <h1 id="i18n-crs-title" class="crs-title">DOTAZNÍK RELIGIOZITY (CRS-15)</h1>
+            <p id="i18n-crs-lead" class="crs-lead">
                 Instrukce: Přečtěte si prosím pečlivě následující otázky a u každé z nich zvolte odpověď, která nejlépe vystihuje váš postoj, přesvědčení nebo chování.
             </p>
             <div id="crs-error-banner" class="submit-error-banner crs-error-banner" role="alert" hidden></div>
             <form id="crs-form" novalidate>
                 <div id="crs-form-fields"></div>
                 <div class="crs-footer-actions">
-                    <button type="submit" id="crs-submit-btn" class="btn-save">Odeslat výsledky</button>
+                    <button type="submit" id="i18n-crs-submit-btn" class="btn-save">Odeslat výsledky</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <script src="i18n.js"></script>
     <script src="crs-questions.js"></script>
     <script src="script.js"></script>
 </body>

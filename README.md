@@ -7,6 +7,7 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 ### Úvodní obrazovka
 - Zadání **ID účastníka**.
 - Volba **varianty experimentu** jako čísla **1–6** (účastník nevidí názvy kategorií ani technický popis režimu).
+- Přepínač **Čeština / English** na úvodní kartě: ukládá se do prohlížeče (`localStorage`) a řídí texty rozhraní, **slova na ose** (česká / anglická podoba stejného stimulu) a znění CRS-15.
 
 ### Slova a kategorie
 - Slovní podněty jsou ve skriptu rozdělená do tří kategorií: **`good`**, **`bad`**, **`neutral`** (interní označení pro výzkumníka a export).
@@ -50,7 +51,8 @@ Webová aplikace pro sběr dat v psycholingvistickém / religionistickém experi
 | `index.html` | Stránky, úvodní formulář (ID + volba 1–6), rozložení experimentu |
 | `style.css` | Vzhled, responzivní layout, osa a karty slov |
 | `script.js` | Slovníky kategorií, varianty, náhodné pořadí, drag & drop, výpočet skóre, přechod na CRS, odeslání přes API |
-| `crs-questions.js` | Znění otázek a odpovědí CRS-15 (zdroj pro formulář a export) |
+| `i18n.js` | Přepínání jazyka rozhraní (cs / en) a texty tlačítek, instrukcí, CRS nadpisů |
+| `crs-questions.js` | Znění otázek a odpovědí CRS-15 v **češtině i angličtině** (formulář a export podle volby) |
 | `api/submit.js` | **Serverless funkce (Vercel):** přijme CSV v JSON a odešle ho e-mailem (Resend) |
 | `package.json` | Závislost `resend` pro e-mailovou funkci |
 
@@ -91,17 +93,18 @@ Pokud **`RESEND_API_KEY`** nebo **`RESULTS_EMAIL`** chybí, API vrátí stav **5
 
 ## Export dat (CSV)
 
-E-mail obsahuje přílohu **`vysledky_[ID].csv`** (experiment) a při dokončeném CRS i **`crs_[ID].csv`**. V souboru CRS jsou sloupce mimo jiné: číslo otázky, plné znění otázky, index zvolené odpovědi a text odpovědi.
+E-mail obsahuje přílohu **`vysledky_[ID].csv`** (experiment) a při dokončeném CRS i **`crs_[ID].csv`**. V souboru CRS jsou sloupce mimo jiné: **`Jazyk_rozhrani`**, číslo otázky, plné znění otázky, index zvolené odpovědi a text odpovědi.
 
 Hlavička souboru experimentu obsahuje mimo jiné:
 
 - **`ID_Ucastnika`** – zadané ID.
+- **`Jazyk_rozhrani`** – `cs` nebo `en` (jazyk rozhraní v době dokončení).
 - **`Varianta_Cislo_Ucastnika`** – volba **1–6**, jak ji viděl účastník.
 - **`Varianta_Klic`** – interní klíč varianty (např. `one-by-one-neutral-good`).
 - **`Varianta_Popis`** – čitelný popis pro výzkumníka (např. režim + sada kategorií).
 - **`Kategorie_V_Session`** – které kategorie stimulů byly ve zvolené variantě aktivní (oddělené `|`).
 - **`Slovo_Kategorie`** – interní kategorie konkrétního slova (`neutral` / `good` / `bad`).
-- **`Slovo`** – text stimulu.
+- **`Slovo`** – text stimulu v jazyce rozhraní (`cs` / `en` ve sloupci **`Jazyk_rozhrani`**).
 - **`Body_Moc`** – hodnota na ose **−50 až 50** (desetinné číslo).
 
 Technické poznámky: UTF-8 s BOM; řazení výsledků v CSV podle skóre sestupně; oddělovač **`;`**.
@@ -109,7 +112,7 @@ Technické poznámky: UTF-8 s BOM; řazení výsledků v CSV podle skóre sestup
 ## Úpravy experimentu
 
 ### Změna slovníčku
-Upravte objekt **`wordsByCategory`** v souboru **`script.js`** – pole řetězců pod klíči **`neutral`**, **`good`**, **`bad`**. Strukturu **`wordsData`** měnit nemusíte; skládá se automaticky.
+Upravte objekt **`wordsByCategory`** v souboru **`script.js`** – pod klíči **`neutral`**, **`good`**, **`bad`** jsou položky ve tvaru **`{ cs: "…", en: "…" }`**. Strukturu **`wordsData`** měnit nemusíte; skládá se automaticky a zobrazení vybírá **`getWordDisplayLabel`** podle **`Jazyk_rozhrani`**.
 
 ### Změna variant (pro výzkumníka)
 Objekt **`variants`** ve **`script.js`** definuje pro každou variantu:
