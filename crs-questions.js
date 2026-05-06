@@ -10,88 +10,84 @@ const CRS_QUESTIONS_BY_LANG = {
         },
         {
             id: 2,
-            text: "Jak moc se zajímáte o to, abyste se dozvěděli více o náboženských tématech?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Jak moc se zajímáte o náboženská témata z osobního zájmu?",
+            options: ["Vůbec ne", "Mírně", "Středně", "Silně", "Velmi silně"]
         },
         {
             id: 3,
-            text: "Jak často se informujete o náboženských otázkách prostřednictvím rádia, televize, internetu, novin nebo knih?",
+            text: "Jak často vyhledáváte informace o náboženských otázkách (např. prostřednictvím médií, knih, diskusí)?",
             options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 4,
-            text: "Do jaké míry věříte, že existuje Bůh nebo něco božského?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Do jaké míry věříte v existenci dobra a zla jako samostatných, nezávislých sil v náboženském smyslu?",
+            options: ["Vůbec nevěřím", "Spíše nevěřím", "Nejsem si jist", "Spíše věřím", "Určitě věřím"]
         },
         {
             id: 5,
-            text: "Do jaké míry věříte v posmrtný život (např. nesmrtelnost duše, vzkříšení z mrtvých nebo reinkarnaci)?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Do jaké míry věříte v posmrtný život (např. nesmrtelnost duše, vzkříšení)?",
+            options: ["Vůbec nevěřím", "Spíše nevěřím", "Nejsem si jist", "Spíše věřím", "Určitě věřím"]
         },
         {
             id: 6,
-            text: "Jak pravděpodobné je podle vašeho názoru, že skutečně existuje vyšší moc?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Jaká je podle vás pravděpodobnost, že Bůh nebo božská spravedlnost skutečně existuje?",
+            options: ["0 % (určitě ne)", "25 %", "50 %", "75 %", "100 % (určitě ano)"]
         },
         {
             id: 7,
-            text: "Jak často se účastníte bohoslužeb nebo náboženských obřadů?",
-            options: [
-                "Více než jednou týdně",
-                "Jednou týdně",
-                "Jednou až třikrát měsíčně",
-                "Několikrát ročně",
-                "Méně často",
-                "Nikdy"
-            ]
+            text: "Jak často se účastníte náboženských obřadů (např. bohoslužby, modlitby v komunitě)?",
+            options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 8,
-            text: "Jak důležitá je pro vás účast na bohoslužbách / náboženských obřadech?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Jak důležité je pro vás účastnit se náboženských obřadů?",
+            options: [
+                "Vůbec není důležité",
+                "Mírně důležité",
+                "Středně důležité",
+                "Důležité",
+                "Velmi důležité"
+            ]
         },
         {
             id: 9,
-            text: "Jak důležité je pro vás být ve spojení s náboženskou komunitou?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Jak často se modlíte (nebo praktikujete jinou formu soukromé náboženské praxe)?",
+            options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 10,
-            text: "Jak často se modlíte?",
+            text: "Jak důležitá je pro vás osobní modlitba?",
             options: [
-                "Několikrát denně",
-                "Jednou denně",
-                "Více než jednou týdně",
-                "Jednou týdně",
-                "Jednou až třikrát měsíčně",
-                "Několikrát ročně",
-                "Méně často",
-                "Nikdy"
+                "Vůbec není důležitá",
+                "Mírně důležitá",
+                "Středně důležitá",
+                "Důležitá",
+                "Velmi důležitá"
             ]
         },
         {
             id: 11,
-            text: "Jak důležitá je pro vás osobní modlitba?",
-            options: ["Vůbec ne", "Nepříliš", "Středně", "Docela dost", "Velmi"]
+            text: "Jak často se modlíte spontánně, když vás k tomu inspirují každodenní situace?",
+            options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 12,
-            text: "Jak často se spontánně modlíte, když vás k tomu inspirují každodenní situace?",
+            text: "Jak často zažíváte situace, v nichž máte pocit, že Bůh nebo něco božského zasahuje do vašeho života?",
             options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 13,
-            text: "Jak často zažíváte situace, ve kterých máte pocit, že Bůh nebo něco božského zasahuje do vašeho života?",
+            text: "Jak často zažíváte situace, v nichž máte pocit, že jste v jednotě se vším v náboženském či duchovním smyslu?",
             options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 14,
-            text: "Jak často zažíváte situace, ve kterých máte pocit, že Bůh nebo něco božského se vám snaží něco sdělit nebo odhalit?",
+            text: "Jak často zažíváte situace, v nichž máte pocit, že se vás dotýká božská síla?",
             options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         },
         {
             id: 15,
-            text: "Jak často zažíváte situace, ve kterých máte pocit, že Bůh nebo něco božského je přítomno?",
+            text: "Jak často máte pocit, že jsou dobro a zlo v náboženském kontextu v rovnováze?",
             options: ["Nikdy", "Zřídka", "Občas", "Často", "Velmi často"]
         }
     ],
@@ -103,88 +99,96 @@ const CRS_QUESTIONS_BY_LANG = {
         },
         {
             id: 2,
-            text: "How interested are you in learning more about religious topics?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
+            text: "How interested are you in religious topics out of personal interest?",
+            options: ["Not at all", "Slightly", "Moderately", "Strongly", "Very strongly"]
         },
         {
             id: 3,
-            text: "How often do you seek information about religious issues via radio, TV, the Internet, newspapers, or books?",
+            text: "How often do you seek information about religious questions (e.g. via media, books, discussions)?",
             options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
         },
         {
             id: 4,
-            text: "To what extent do you believe that God or something divine exists?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
-        },
-        {
-            id: 5,
-            text: "To what extent do you believe in an afterlife (e.g. immortality of the soul, resurrection of the dead, or reincarnation)?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
-        },
-        {
-            id: 6,
-            text: "How likely do you think it is that a higher power truly exists?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
-        },
-        {
-            id: 7,
-            text: "How often do you attend worship services or religious ceremonies?",
+            text: "To what extent do you believe in the existence of good and evil as separate, independent forces in a religious sense?",
             options: [
-                "More than once a week",
-                "Once a week",
-                "One to three times a month",
-                "Several times a year",
-                "Less often",
-                "Never"
+                "I do not believe at all",
+                "I rather do not believe",
+                "I am not sure",
+                "I rather believe",
+                "I definitely believe"
             ]
         },
         {
+            id: 5,
+            text: "To what extent do you believe in an afterlife (e.g. immortality of the soul, resurrection)?",
+            options: [
+                "I do not believe at all",
+                "I rather do not believe",
+                "I am not sure",
+                "I rather believe",
+                "I definitely believe"
+            ]
+        },
+        {
+            id: 6,
+            text: "In your opinion, how likely is it that God or divine justice truly exists?",
+            options: ["0% (definitely not)", "25%", "50%", "75%", "100% (definitely yes)"]
+        },
+        {
+            id: 7,
+            text: "How often do you participate in religious ceremonies (e.g. worship services, prayer in a community)?",
+            options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
+        },
+        {
             id: 8,
-            text: "How important is it for you to attend worship services / religious ceremonies?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
+            text: "How important is it for you to participate in religious ceremonies?",
+            options: [
+                "Not important at all",
+                "Slightly important",
+                "Moderately important",
+                "Important",
+                "Very important"
+            ]
         },
         {
             id: 9,
-            text: "How important is it for you to be connected with a religious community?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
+            text: "How often do you pray (or practice another form of private religious practice)?",
+            options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
         },
         {
             id: 10,
-            text: "How often do you pray?",
+            text: "How important is personal prayer for you?",
             options: [
-                "Several times a day",
-                "Once a day",
-                "More than once a week",
-                "Once a week",
-                "One to three times a month",
-                "Several times a year",
-                "Less often",
-                "Never"
+                "Not important at all",
+                "Slightly important",
+                "Moderately important",
+                "Important",
+                "Very important"
             ]
         },
         {
             id: 11,
-            text: "How important is personal prayer for you?",
-            options: ["Not at all", "Not much", "Moderately", "Quite a bit", "Very much"]
-        },
-        {
-            id: 12,
-            text: "How often do you spontaneously pray when everyday situations inspire you to?",
+            text: "How often do you pray spontaneously when inspired by everyday situations?",
             options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
         },
         {
-            id: 13,
+            id: 12,
             text: "How often do you experience situations in which you feel that God or something divine intervenes in your life?",
             options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
         },
         {
+            id: 13,
+            text: "How often do you experience situations in which you feel that you are in unity with everything in a religious or spiritual sense?",
+            options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
+        },
+        {
             id: 14,
-            text: "How often do you experience situations in which you feel that God or something divine is trying to tell or reveal something to you?",
+            text: "How often do you experience situations in which you feel touched by a divine power?",
             options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
         },
         {
             id: 15,
-            text: "How often do you experience situations in which you feel that God or something divine is present?",
+            text: "How often do you feel that good and evil are in balance in a religious context?",
             options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
         }
     ]
