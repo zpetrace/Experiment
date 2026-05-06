@@ -19,9 +19,9 @@
 
             sidebar_words_heading: "Slova k roztřídění",
             instr_exp_all:
-                "Seřaďte všechna zobrazená slova na vertikální osu. Pozici můžete upravit opětovným přetažením.",
+                "Seřaďte všechna zobrazená slova na vertikální osu dle vlastního uvážení. Pozici slov již poté prosím neupravujte.",
             instr_exp_one:
-                "Seřaďte každé zobrazené slovo na vertikální osu. Pozici můžete upravit opětovným přetažením.",
+                "Seřaďte každé zobrazené slovo na vertikální osu dle vlastního uvážení. Pozici slov již poté prosím neupravujte.",
 
             continue_crs: "Pokračovat k dotazníku",
 
@@ -59,9 +59,9 @@
 
             sidebar_words_heading: "Words to sort",
             instr_exp_all:
-                "Place all shown words on the vertical axis. You can adjust a word by dragging it again.",
+                "Place all shown words on the vertical axis. Please do not adjust the position of words afterwards.",
             instr_exp_one:
-                "Place each shown word on the vertical axis. You can adjust a word by dragging it again.",
+                "Place each shown word on the vertical axis. Please do not adjust the position of words afterwards.",
 
             continue_crs: "Continue to questionnaire",
 
