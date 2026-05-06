@@ -25,9 +25,9 @@
 
             continue_crs: "Pokračovat k dotazníku",
 
-            crs_screen_title: "DOTAZNÍK RELIGIOZITY (CRS-15)",
+            crs_screen_title: "Dotazníkové otázky",
             crs_screen_lead:
-                "Instrukce: Přečtěte si prosím pečlivě následující otázky a u každé z nich zvolte odpověď, která nejlépe vystihuje váš postoj, přesvědčení nebo chování.",
+                "Prosím, odpovězte upřímně a samostatně na každou otázku. Odpovědi jsou anonymní a budou použity pouze pro vědecké účely. Označte svou odpověď u následujících otázek.",
             crs_submit: "Odeslat výsledky",
 
             crs_done_title: "Hotovo!",
@@ -65,9 +65,9 @@
 
             continue_crs: "Continue to questionnaire",
 
-            crs_screen_title: "CENTRALITY OF RELIGIOSITY SCALE (CRS-15)",
+            crs_screen_title: "Questionnaire Items",
             crs_screen_lead:
-                "Instructions: Please read each item carefully and choose the response that best describes your attitude, belief, or behaviour.",
+                "Please answer each question honestly and independently. Responses are anonymous and will be used for scientific purposes only. Mark your answer for the following questions.",
             crs_submit: "Submit responses",
 
             crs_done_title: "Thank you",
